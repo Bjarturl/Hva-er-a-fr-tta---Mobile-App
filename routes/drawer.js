@@ -24,6 +24,7 @@ const RootDrawerNavigator = createDrawerNavigator(
     drawerWidth: 250,
     contentOptions: {
       inactiveTintColor: 'white',
+      activeTintColor: '#2E2E2E'
     },
   }
 );

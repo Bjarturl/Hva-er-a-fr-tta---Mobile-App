@@ -8,70 +8,176 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Alert,
+  BackHandler,
 } from "react-native";
 import Storage from "../../services/storage";
 import { MaterialIcons } from "@expo/vector-icons";
-
 import { connect } from "react-redux";
 import { initFavorites } from "../../redux/actions";
 import { bindActionCreators } from "redux";
 import Content from "../Article/content";
+import GestureRecognizer, {
+  swipeDirections,
+} from "react-native-swipe-gestures";
+
 // Function that displays favorite articles from local storage
 function Favorites({ favorites, initFavorites, navigation }) {
   const [curr, setCurr] = useState("");
   const handlePress = (key) => {
     setCurr(key);
   };
+
+  const handleBacking = () => {
+    setCurr("");
+    if (global.backPresses >= 2) {
+      BackHandler.exitApp();
+    }
+    return true;
+  };
+  useEffect(() => {
+    if (curr == "") {
+      BackHandler.addEventListener("hardwareBackPress", handleBacking);
+    } else {
+      BackHandler.removeEventListener("hardwareBackPress", handleBacking);
+    }
+  }, [curr]);
   const handleArrowPress = (dir) => {
-    if(dir == "left") {
-      if(curr == 0) {
+    if (dir == "left") {
+      if (curr == 0) {
         setCurr(favorites.length - 1);
       } else {
         setCurr((prevCurr) => {
           return prevCurr - 1;
-        })
+        });
       }
     }
-    if(dir == "right") {
-      if(curr == favorites.length - 1) {
+    if (dir == "right") {
+      if (curr == favorites.length - 1) {
         setCurr(0);
       } else {
         setCurr((prevCurr) => {
           return prevCurr + 1;
-        })
+        });
       }
     }
-  }
+  };
+
+  const deleteAll = () => {
+    Alert.alert(
+      "Hreinsa lista",
+      "Ertu viss um að þú viljir eyða öllum fréttum úr listanum?",
+      [
+        {
+          text: "Nei",
+          onPress: () => {},
+          style: "cancel",
+        },
+        {
+          text: "Já",
+          onPress: () => {
+            Storage.clearFavorites().then(() => {
+              initFavorites([]);
+            });
+          },
+        },
+      ]
+    );
+  };
+
   const removeCurrent = () => {
-    Storage.removeFromFavorites(favorites[curr]).then(() => {
-      Storage.getFavorites().then((data) => {
-        initFavorites(data);
-        setCurr("");
-      });
-    });
-  }
+    Alert.alert("Eyða frétt", "Ertu viss um að þú viljir eyða þessari frétt?", [
+      {
+        text: "Nei",
+        onPress: () => {},
+        style: "cancel",
+      },
+      {
+        text: "Já",
+        onPress: () => {
+          var index = curr;
+          setCurr("");
+          Storage.removeFromFavorites(favorites[index]).then(() => {
+            Storage.getFavorites().then((data) => {
+              initFavorites(data);
+            });
+          });
+        },
+      },
+    ]);
+  };
   if (curr !== "") {
     return (
       <View style={{ flex: 1, padding: 8 }}>
-        <View style={{flex:0, flexDirection:"row", justifyContent: "center"}}>
-      
-          <View style={{position: "absolute", left: 0}}><MaterialIcons name="arrow-back" size={32} onPress={() => handleArrowPress("left")} /></View>
-          <View><MaterialIcons name="view-list" size={32} onPress={() => setCurr("")} /></View>
-          <View><MaterialIcons name="delete" size={32} onPress={removeCurrent} color="red" /></View>
-          <View style={{position: "absolute", right: 0}}><MaterialIcons name="arrow-forward" size={32} onPress={() => handleArrowPress("right")} /></View>
+        <View
+          style={{
+            flex: 0,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <View>
+            <MaterialIcons
+              name="view-list"
+              size={40}
+              onPress={() => setCurr("")}
+            />
+          </View>
+          <View>
+            <MaterialIcons
+              name="delete"
+              size={40}
+              onPress={removeCurrent}
+              color="red"
+            />
+          </View>
         </View>
-        <ScrollView style={{flex: 1}}>
-        <Text style={{fontSize: 20}}>{curr+1}</Text>
-          <Content article={favorites[curr]} />
+        <ScrollView style={{ flex: 1 }}>
+          <GestureRecognizer
+            onSwipeLeft={() => handleArrowPress("left")}
+            onSwipeRight={() => handleArrowPress("right")}
+            config={{
+              velocityThreshold: 0.3,
+              directionalOffsetThreshold: 80,
+            }}
+          >
+            <Content article={favorites[curr]} />
+          </GestureRecognizer>
         </ScrollView>
-
+        <View
+          style={{
+            flex: 0,
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            height: 35,
+          }}
+        >
+          <View style={{ position: "absolute", left: 0 }}>
+            <MaterialIcons
+              name="arrow-back"
+              size={40}
+              onPress={() => handleArrowPress("left")}
+            />
+          </View>
+          <Text style={{ fontSize: 25 }}>
+            {curr + 1} / {favorites.length}
+          </Text>
+          <View style={{ position: "absolute", right: 0 }}>
+            <MaterialIcons
+              name="arrow-forward"
+              size={40}
+              onPress={() => handleArrowPress("right")}
+            />
+          </View>
+        </View>
       </View>
     );
   }
   return (
     <View style={{ flex: favorites.length == 0 ? 0 : 1 }}>
       <FlatList
-        data={favorites}
+        data={favorites.sort((a, b) => a.dateAdded < b.dateAdded)}
         numColumns={2}
         keyExtractor={(item) => item.key.toString()}
         renderItem={({ item, index }) => (
@@ -81,7 +187,18 @@ function Favorites({ favorites, initFavorites, navigation }) {
                 handlePress(index);
               }}
             >
-              <Text>{index+1}</Text>
+              <View
+                style={{
+                  flex: 0,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ fontSize: 12 }}>
+                  {item.dateAdded.split("T")[0].split("-").reverse().join("-")}
+                </Text>
+                <Text style={{ marginRight: 5 }}>{index + 1}</Text>
+              </View>
               <Text style={styles.headline} numberOfLines={2}>
                 {item.headline}
               </Text>
@@ -105,9 +222,7 @@ function Favorites({ favorites, initFavorites, navigation }) {
           title="Hreinsa lista"
           color="red"
           onPress={() => {
-            Storage.clearFavorites().then(() => {
-              initFavorites([]);
-            });
+            deleteAll();
           }}
         />
       )}

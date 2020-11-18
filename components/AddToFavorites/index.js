@@ -33,7 +33,8 @@ function AddToFavorites({ article, initFavorites, favorites }) {
     async function updateFavorites() {
       if (icon === "favorite") {
         // This means heart was pressed
-        Storage.addToFavorites(article).then(() => {
+        Storage.addToFavorites(article).then((msg) => {
+          Toast.show(msg);
           Storage.getFavorites().then((data) => {
             initFavorites(data);
             // setColor("red");
@@ -54,13 +55,14 @@ function AddToFavorites({ article, initFavorites, favorites }) {
 
   // Notify user what happened and change icon style when heart is pressed
   const changeIcon = () => {
-    if(!article.article) { return;}
+    if (!article.article) {
+      return;
+    }
     setIcon((prevIcon) => {
       if (prevIcon == "favorite-border") {
-        Toast.show("Grein bætt í safn :)", Toast.LONG, Toast.TOP);
         return "favorite";
       } else {
-        Toast.show("Grein fjarlægð úr safni :(");
+        Toast.show("Grein fjarlægð úr safni.");
         return "favorite-border";
       }
     });

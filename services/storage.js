@@ -5,7 +5,8 @@ var ID = function () {
 };
 const Storage = {
   getFavorites: async function () {
-    return JSON.parse((await AsyncStorage.getItem("favorites")) || "[]");
+    var favorites = JSON.parse((await AsyncStorage.getItem("favorites")) || "[]");
+    return favorites
   },
   getLastFavorite: async function () {
     var favorites = JSON.parse(
@@ -16,12 +17,16 @@ const Storage = {
   addToFavorites: async function (article) {
     var favorites = await this.getFavorites();
     if (favorites.find((f) => f.article == article.article)) {
-      return;
+      return "";
+    }
+    if(favorites.length == 100) {
+      return "Ekki tókst að bæta við grein. Hámarksfjölda greina náð (100)."
     }
     await AsyncStorage.setItem(
       "favorites",
-      JSON.stringify([...favorites, { ...article, key: `${ID()}` }])
+      JSON.stringify([...favorites, { ...article, key: `${ID()}`, dateAdded: new Date()}])
     );
+    return "Grein bætt í safn."
   },
   removeFromFavorites: async function (article) {
     var favorites = await this.getFavorites();

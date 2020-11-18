@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "HvadErAdFretta",
-    "slug": "HvadErAdFretta",
-    "version": "1.0.0",
+    "name": "Hvað er að frétta?",
+    "slug": "hvad-er-ad-fretta",
+    "version": "2.0.0",
+    "sdkVersion": "39.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/news_icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash_news.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,16 +18,19 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bjartur.hvaderadfretta"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/news_icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.bjartur.hvaderadfretta"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/news_icon.png"
+    },
+    "description": "Hvað er eiginlega að frétta??"
   }
 }
