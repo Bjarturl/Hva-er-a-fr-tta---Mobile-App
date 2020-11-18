@@ -2,7 +2,7 @@
   "expo": {
     "name": "Hvað er að frétta?",
     "slug": "hvad-er-ad-fretta",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "sdkVersion": "39.0.0",
     "orientation": "portrait",
     "icon": "./assets/news_icon.png",
@@ -12,6 +12,7 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
+      "enabled": true,
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
