@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-simple-toast";
+import { MaterialIcons } from "@expo/vector-icons";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+
 import Storage from "../../services/storage";
 import { initFavorites } from "../../redux/actions";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
 
 // Function to add articles to favorites
 function AddToFavorites({ article, initFavorites, favorites }) {
   const [icon, setIcon] = useState("favorite-border");
   const [color, setColor] = useState("black");
 
-  // Reset state when article changes
+  // Reset heart when article changes
   useEffect(() => {
     setIcon("favorite-border");
   }, [article]);
+
+  // When favorites state changes we also want to change the heart color
   useEffect(() => {
     Storage.exists(article).then((exists) => {
       if (exists) {
@@ -28,8 +31,9 @@ function AddToFavorites({ article, initFavorites, favorites }) {
     });
   }, [favorites]);
 
-  // Update state with added favorites
+  // Update favorites
   useEffect(() => {
+    // Function that adds articles to favorites storage asynchronously
     async function updateFavorites() {
       if (icon === "favorite") {
         // This means heart was pressed
@@ -37,7 +41,6 @@ function AddToFavorites({ article, initFavorites, favorites }) {
           Toast.show(msg);
           Storage.getFavorites().then((data) => {
             initFavorites(data);
-            // setColor("red");
           });
         });
       } else {
@@ -45,7 +48,6 @@ function AddToFavorites({ article, initFavorites, favorites }) {
         Storage.removeFromFavorites(article).then(() => {
           Storage.getFavorites().then((data) => {
             initFavorites(data);
-            // setColor("black");
           });
         });
       }
@@ -53,8 +55,9 @@ function AddToFavorites({ article, initFavorites, favorites }) {
     updateFavorites();
   }, [icon]);
 
-  // Notify user what happened and change icon style when heart is pressed
+  // Change icon style when heart is pressed
   const changeIcon = () => {
+    // If heart was pressed without an article loaded, do nothing
     if (!article.article) {
       return;
     }
@@ -62,6 +65,7 @@ function AddToFavorites({ article, initFavorites, favorites }) {
       if (prevIcon == "favorite-border") {
         return "favorite";
       } else {
+        // Only applies if user removes from favorites in front page menu
         Toast.show("Grein fjarlægð úr safni.");
         return "favorite-border";
       }
@@ -75,6 +79,7 @@ function AddToFavorites({ article, initFavorites, favorites }) {
   );
 }
 
+// Component styles
 const styles = StyleSheet.create({
   content: {
     position: "absolute",
@@ -83,11 +88,14 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
 });
+
+// Redux props
 const mapStateToProps = (state) => {
   const { favorites } = state;
   return { favorites };
 };
 
+// Redux actions
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {

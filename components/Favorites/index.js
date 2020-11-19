@@ -11,30 +11,35 @@ import {
   Alert,
   BackHandler,
 } from "react-native";
-import Storage from "../../services/storage";
+import GestureRecognizer from "react-native-swipe-gestures";
 import { MaterialIcons } from "@expo/vector-icons";
 import { connect } from "react-redux";
-import { initFavorites } from "../../redux/actions";
 import { bindActionCreators } from "redux";
+
+import { initFavorites } from "../../redux/actions";
+import Storage from "../../services/storage";
 import Content from "../Article/content";
-import GestureRecognizer, {
-  swipeDirections,
-} from "react-native-swipe-gestures";
 
 // Function that displays favorite articles from local storage
-function Favorites({ favorites, initFavorites, navigation }) {
+function Favorites({ favorites, initFavorites }) {
+  // Selected favorite
   const [curr, setCurr] = useState("");
+
+  // Handle article pressing from grid view
   const handlePress = (key) => {
     setCurr(key);
   };
 
+  // When user presses back button on phone, go to grid view
   const handleBacking = () => {
     setCurr("");
+    // Double tapping back exits app
     if (global.backPresses >= 2) {
       BackHandler.exitApp();
     }
     return true;
   };
+  // Add back button handler when selecting an article, otherwise remove it
   useEffect(() => {
     if (curr == "") {
       BackHandler.addEventListener("hardwareBackPress", handleBacking);
@@ -42,9 +47,12 @@ function Favorites({ favorites, initFavorites, navigation }) {
       BackHandler.removeEventListener("hardwareBackPress", handleBacking);
     }
   }, [curr]);
+
+  // Change index when user presses left or right arrow in favorites display
   const handleArrowPress = (dir) => {
     if (dir == "left") {
       if (curr == 0) {
+        // Loop
         setCurr(favorites.length - 1);
       } else {
         setCurr((prevCurr) => {
@@ -54,6 +62,7 @@ function Favorites({ favorites, initFavorites, navigation }) {
     }
     if (dir == "right") {
       if (curr == favorites.length - 1) {
+        // Loop
         setCurr(0);
       } else {
         setCurr((prevCurr) => {
@@ -63,7 +72,9 @@ function Favorites({ favorites, initFavorites, navigation }) {
     }
   };
 
+  // When delete all button is pressed
   const deleteAll = () => {
+    // Confirm button press
     Alert.alert(
       "Hreinsa lista",
       "Ertu viss um að þú viljir eyða öllum fréttum úr listanum?",
@@ -85,7 +96,9 @@ function Favorites({ favorites, initFavorites, navigation }) {
     );
   };
 
+  // When trash can is pressed (delete a single favorite)
   const removeCurrent = () => {
+    // Confirm button press
     Alert.alert("Eyða frétt", "Ertu viss um að þú viljir eyða þessari frétt?", [
       {
         text: "Nei",
@@ -106,9 +119,11 @@ function Favorites({ favorites, initFavorites, navigation }) {
       },
     ]);
   };
+  // If an item is selected display content along with header and footer
   if (curr !== "") {
     return (
       <View style={{ flex: 1, padding: 8 }}>
+        {/* Header menu */}
         <View
           style={{
             flex: 0,
@@ -132,10 +147,12 @@ function Favorites({ favorites, initFavorites, navigation }) {
             />
           </View>
         </View>
+        {/* Content */}
         <ScrollView style={{ flex: 1 }}>
+          {/* Navigate with swiping enabled */}
           <GestureRecognizer
-            onSwipeLeft={() => handleArrowPress("left")}
-            onSwipeRight={() => handleArrowPress("right")}
+            onSwipeLeft={() => handleArrowPress("right")}
+            onSwipeRight={() => handleArrowPress("left")}
             config={{
               velocityThreshold: 0.3,
               directionalOffsetThreshold: 80,
@@ -153,6 +170,7 @@ function Favorites({ favorites, initFavorites, navigation }) {
             height: 35,
           }}
         >
+          {/* Footer menu */}
           <View style={{ position: "absolute", left: 0 }}>
             <MaterialIcons
               name="arrow-back"
@@ -175,12 +193,14 @@ function Favorites({ favorites, initFavorites, navigation }) {
     );
   }
   return (
+    // Otherwise return grid of all favorites
     <View style={{ flex: favorites.length == 0 ? 0 : 1 }}>
       <FlatList
         data={favorites.sort((a, b) => a.dateAdded < b.dateAdded)}
         numColumns={2}
         keyExtractor={(item) => item.key.toString()}
         renderItem={({ item, index }) => (
+          // Favorite card item
           <View style={styles.card}>
             <TouchableOpacity
               onPress={() => {
@@ -212,12 +232,14 @@ function Favorites({ favorites, initFavorites, navigation }) {
           </View>
         )}
       />
+      {/* If no favorites have been recorded, display info on how to */}
       {favorites.length == 0 ? (
         <Text style={styles.info}>
           Engar uppáhalds fréttir skráðar. Skoðaðu fréttir og smelltu á hjartað
           efst í hægra horninu til að geyma þær!
         </Text>
       ) : (
+        // Delete all favorites
         <Button
           title="Hreinsa lista"
           color="red"
@@ -229,6 +251,8 @@ function Favorites({ favorites, initFavorites, navigation }) {
     </View>
   );
 }
+
+// Component styles
 const styles = StyleSheet.create({
   info: {
     textAlign: "center",
@@ -255,10 +279,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
+
+// Redux favorites
 const mapStateToProps = (state) => {
   const { favorites } = state;
   return { favorites };
 };
+
+// Redux actions
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {

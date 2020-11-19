@@ -4,12 +4,14 @@ import React from "react";
 import Header from "../components/Header";
 import Favorites from "../components/Favorites";
 
+// Favorites page stack
 const screens = {
   Favorites: {
     screen: Favorites,
     navigationOptions: ({ navigation }) => {
       return {
         headerTitle: () => (
+          // Render custom header component
           <Header title="Mínar fréttir" navigation={navigation} />
         ),
       };

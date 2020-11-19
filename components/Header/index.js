@@ -2,9 +2,11 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
+// App header component
 export default function Header({ title, navigation }) {
   return (
     <View style={styles.header}>
+      {/* Drawer icon */}
       <MaterialIcons
         name="menu"
         size={28}
@@ -20,6 +22,7 @@ export default function Header({ title, navigation }) {
   );
 }
 
+// Component styles
 const styles = StyleSheet.create({
   header: {
     height: "100%",

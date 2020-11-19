@@ -1,28 +1,28 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  Image,
-  View,
-} from "react-native";
+import { StyleSheet, Text, Image, View } from "react-native";
 
+// Function that renders article content
 function Content({ article }) {
   return (
     <View>
+      {/* Headline */}
       <Text style={styles.headline}>{article.headline}</Text>
-
+      {/* News image */}
       <Image
         style={styles.image}
         source={{
           uri: article.image,
         }}
       />
+      {/* Caption */}
       <Text style={styles.caption}>{article.caption}</Text>
+      {/* Article */}
       <Text style={styles.article}>{article.article}</Text>
     </View>
   );
 }
 
+// Component styles
 const styles = StyleSheet.create({
   headline: {
     fontWeight: "bold",

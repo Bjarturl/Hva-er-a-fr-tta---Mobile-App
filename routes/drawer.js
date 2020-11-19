@@ -4,6 +4,7 @@ import { createAppContainer } from "react-navigation";
 import HomeStack from "./homeStack";
 import FavoriteStack from "./favoriteStack";
 
+// Drawer menu options
 const RootDrawerNavigator = createDrawerNavigator(
   {
     Article: {
