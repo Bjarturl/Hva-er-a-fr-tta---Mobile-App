@@ -7,3 +7,5 @@ and are generated using Markov chains.
 ![Generated article](https://github.com/Bjarturl/Hvaderadfretta-mobile/blob/main/demonstration/screen2.png "Generated article")
 ![Favorites menu](https://github.com/Bjarturl/Hvaderadfretta-mobile/blob/main/demonstration/screen3.png "Favorites menu")
 ![Favorites menu details](https://github.com/Bjarturl/Hvaderadfretta-mobile/blob/main/demonstration/screen4.png "Favorites menu details")
+## Live demo
+[![Video demo](http://img.youtube.com/vi/Q1vlJLLIq_A/0.jpg)](http://www.youtube.com/watch?v=Q1vlJLLIq_A)
